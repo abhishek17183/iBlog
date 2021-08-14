@@ -3,8 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_mail import Mail
 import math
-import pymysql
-pymysql.install_as_MySQLdb()
 
 app = Flask(__name__)
 app.config.update(
@@ -16,19 +14,10 @@ app.config.update(
 
 )
 mail = Mail(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/iblog'
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///iBlog.db"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-class Contact(db.Model):
-    sno = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False)
-    email = db.Column(db.String(50),nullable=False)
-    phone_no = db.Column(db.String(15),nullable=False)
-    date = db.Column(db.String(12), nullable=True)
-    msg = db.Column(db.String(200), nullable=False)
-
-    def __repr__(self):
-        return self.name
 
 class Posts(db.Model):
     sno = db.Column(db.Integer, primary_key=True)
@@ -40,10 +29,10 @@ class Posts(db.Model):
     def __repr__(self):
         return self.title
 
-@app.route("/")
+@app.route("/",methods =['GET'])
 def home():
-    posts = Posts.query.filter_by().all()
-    llast = math.cei(len(posts)/3)
+    posts = Posts.query.all()
+    last = math.ceil(len(posts)/3)
     page = request.args.get('page')
     if (not str(page).isnumeric()):
         page = 1
@@ -58,7 +47,7 @@ def home():
     else:
         prev = "/?page="+ str(page-1)
         next = "/?page="+ str(page+1)
-    print(f"Page Is {page}")
+    
     return render_template('index.html',posts=posts, prev=prev, next=next)
 
 @app.route("/about")
@@ -78,10 +67,6 @@ def contact():
         email=request.form.get('email')
         phone=request.form.get('phone')
         msg=request.form.get('msg')
-
-        entry= Contact(name=name,email=email,phone_no=phone,date=datetime.now(),msg=msg)
-        db.session.add(entry)
-        db.session.commit()
         mail.send_message('New message from ' + name,sender=email,recipients = ['abhishekbiranje1718@gmail.com'],body = 'From ' + email  + "\n" + "Phone No." + phone + "\n" + "Message: " + msg )
         return render_template('contact.html',success=True)
 
@@ -89,4 +74,4 @@ def contact():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0')
