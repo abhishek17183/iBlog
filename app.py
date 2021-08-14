@@ -47,7 +47,6 @@ def home():
     else:
         prev = "/?page="+ str(page-1)
         next = "/?page="+ str(page+1)
-    
     return render_template('index.html',posts=posts, prev=prev, next=next)
 
 @app.route("/about")
@@ -69,7 +68,6 @@ def contact():
         msg=request.form.get('msg')
         mail.send_message('New message from ' + name,sender=email,recipients = ['abhishekbiranje1718@gmail.com'],body = 'From ' + email  + "\n" + "Phone No." + phone + "\n" + "Message: " + msg )
         return render_template('contact.html',success=True)
-
     return render_template('contact.html')
 
 
