@@ -2,6 +2,7 @@ from flask import Flask,render_template,request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_mail import Mail
+import math
 import pymysql
 pymysql.install_as_MySQLdb()
 
@@ -40,9 +41,25 @@ class Posts(db.Model):
         return self.title
 
 @app.route("/")
-def main():
-    posts = Posts.query.all()
-    return render_template('index.html',posts=posts)
+def home():
+    posts = Posts.query.filter_by().all()
+    llast = math.cei(len(posts)/3)
+    page = request.args.get('page')
+    if (not str(page).isnumeric()):
+        page = 1
+    page = int(page)
+    posts = posts[(page-1)*3:(page-1) * 3 + 3]
+    if page==1:
+        prev = "#"
+        next = "/?page="+ str(page+1)
+    elif page==last:
+        prev = "/?page="+ str(page-1)
+        next = "#"
+    else:
+        prev = "/?page="+ str(page-1)
+        next = "/?page="+ str(page+1)
+    print(f"Page Is {page}")
+    return render_template('index.html',posts=posts, prev=prev, next=next)
 
 @app.route("/about")
 def about():
