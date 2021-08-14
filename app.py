@@ -68,7 +68,7 @@ def contact():
         msg=request.form.get('msg')
         mail.send_message('New message from ' + name,sender=email,recipients = ['abhishekbiranje1718@gmail.com'],body = 'From ' + email  + "\n" + "Phone No." + phone + "\n" + "Message: " + msg )
         return render_template('contact.html',success=True)
-    return render_template('contact.html')
+    return render_template('contact.html')    
     
 
 if __name__ == "__main__":
